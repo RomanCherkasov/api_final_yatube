@@ -1,7 +1,7 @@
 # TODO:  Напишите свой вариант
 from posts.models import Follow, Group, Post, User
 from django.shortcuts import get_object_or_404
-from rest_framework import status, viewsets
+from rest_framework import status, viewsets, filters
 from rest_framework.response import Response
 
 from .permissions import IsOwnerOrReadonly
@@ -29,6 +29,8 @@ class GroupViewSet(viewsets.ModelViewSet):
 
 class FollowViewSet(viewsets.ModelViewSet):
     serializer_class = FollowSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['user__username', 'following__username']
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -39,3 +41,17 @@ class FollowViewSet(viewsets.ModelViewSet):
             username=self.request.user.username
         )
         return Follow.objects.filter(user=user).all()
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+    permission_classes = [IsOwnerOrReadonly]
+
+    def get_queryset(self):
+        post_id = self.kwargs.get('post_id')
+        post = get_object_or_404(Post, id=post_id)
+        queryset = post.comments.all()
+        return queryset
+
+    def perform_create(self, serializer):
+        serializer.save(author_id=self.request.user.id)
