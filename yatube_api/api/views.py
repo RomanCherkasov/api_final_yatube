@@ -1,11 +1,10 @@
-# TODO:  Напишите свой вариант
-from posts.models import Follow, Group, Post, User
 from django.shortcuts import get_object_or_404
 from rest_framework import status, viewsets, filters
 from rest_framework.response import Response
 
+from posts.models import Follow, Group, Post, User
 from .permissions import IsOwnerOrReadonly
-from .serializers import PostSerializer,\
+from .serializers import PostSerializer, \
     CommentSerializer, GroupSerializer, FollowSerializer
 
 
