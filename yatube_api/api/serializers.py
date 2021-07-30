@@ -53,8 +53,9 @@ class FollowSerializer(serializers.ModelSerializer):
         ]
 
     def validate(self, data):
-        if data['user'] == data['following'] \
-                and self.context['request'].method == 'POST':
+        is_same_user = data['user'] == data['following']
+        is_post_method = self.context['request'].method == 'POST'
+        if is_same_user and is_post_method:
             raise serializers.ValidationError(
                 'You can not follow for yourself'
             )
